@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load filter %}
+    {% load static %}
+    <title>AKI Helper PredictPage</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" type="text/css" href='/static/assets/css/main.css'>
+    <noscript><link rel="stylesheet" type="text/css" href="/static/assets/css/noscript.css" /></noscript>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+<body class="is-preload">
+<div id="wrapper" >
+<div class="header" style="justify-content: center;vertical-align:center;">
+    <a class="home" href="/homepage/"style="height: 20px;text-align-all: center;"><i class="fa fa-home" style="margin-top:0px;color:white;font-size:20px" title="home"></i></a>
+</div>
+<article>
+    <br><br>
+    <div align = "center">
+    <h1 style="display: inline; text-align: center; line-height: 0.5;">Prediction:</h1>
+    {% if label == 0 %}
+    <h1 style="display: inline; text-align: center; line-height: 0.5; color: green">no AKI</h1>
+    {% else %}
+    <h1 style="color: red; display: inline; text-align: center; line-height: 0.5;">AKI</h1>
+    {% endif %}
+    </div>
+    <br><br>
+    <img src="/static/media/AKIresult.png" width="720px" height="480px"align="center">
+    <p style=" font-family: serif; font-weight: normal; font-size: 1.0rem; line-height: normal; text-align: center;"><br>藍色折線為實際預測結果
+    <br>紅色曲線為平滑後結果</p>
+    <details style="font-family: serif; font-weight: 1.0 rem">
+        <summary style="color: #ffffee; line-height: normal;">預測結果圖形介紹</summary>
+        <br>
+        <img src="/static/images/rp_explain3.png"  width="720px" align="center">
+        <div align="center">
+        <p style="font-family: serif; font-weight:normal; line-height: normal; display: inline;">
+        <br>如圖所示，最左邊的6代表6小時後的預測結果(收集11個小時前到現在的資料）
+        <br>預測結果往右滾動，預測7小時後的發病機率(收集10個小時前到1個小時後資料)
+        <br>後面持續新增一個小時的資料，往後滾動預測12次
+        <br>直到預測17個小時後的發病機率(收集1個小時後到11個小時後的資料）
+        </p>
+        <p style="font-family: serif; font-weight:normal; line-height: normal; color: #ffffee; display: inline;">
+        <br>(AKI顯示結果為第17個小時會不會發生AKI為準）
+        </p>
+        </div>
+        
+    </details>
+</article>
+
+</div>
+        </div>
+        <div id="bg"></div>
+		<!-- Scripts -->
+			<script src="/static/assets/js/jquery.min.js"></script>
+			<script src="/static/assets/js/browser.min.js"></script>
+			<script src="/static/assets/js/breakpoints.min.js"></script>
+			<script src="/static/assets/js/util.js"></script>
+			<script src="/static/assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+		<title>AKI Helper HomePage</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href='/static/assets/css/main.css'>
+		<noscript><link rel="stylesheet" type="text/css" href="/static/assets/css/noscript.css" /></noscript>
+	</head>
+    <body class="is-preload">
+        {% if messages %}
+            <script>
+                {% for msg in messages %}
+                    alert('{{ msg.message }}');
+                {% endfor %}
+            </script>
+        {% endif %}
+        <div id="wrapper" style="width: 100%;">
+            <header id="header">
+                <div class="logo" style="background-color: transparent;">
+{#                    <span class="icon fa fa-stethoscope"></span>#}
+{#                    <span class="image main" style="left: 13rem;width: 20rem"><img src="/static/images/kidneyw.png" alt="" /></span>#}
+                    <img src="/static/images/kidneyS.png" alt="" style="background-color:transparent;width: 90%;margin-top:0.8rem"/>
+                </div>
+                <div class="content">
+                    <div class="inner" style="font-family: 'Noto Sans SC', sans-serif;">
+                        <h3 style="font-weight: normal;font-size: 4rem; line-height: 1;">利用注意力時序機制</h3>
+                        <h2 style="font-weight: normal;font-size: 6rem; line-height: 1;">滾動式預測急性腎衰竭風險</h2>
+                        <h4 style=" font-size: 1.2rem;line-height: 1;">Rolling prediction of acute kidney injury using </h4>
+                        <h4 style=" font-size: 1.2rem;line-height: 1;">Hierarchical attention mechanism and Time series model</h4>
+                    </div>
+                </div>
+                <nav>
+                    <ul style="font-weight: bold;">
+                        <li><a href="#intro" style="font-size: 1.5rem;">Intro</a></li>
+                        <li><a href="#doctor"style="font-size: 1.5rem;">Advisor</a></li>
+                        <li><a href="#aboutModel"style="font-size: 1.5rem;">Model</a></li>
+                        <li><a href="#experiment" style="font-size: 1.5rem;">experiment</a></li>
+                        <li><a href="#predict"style="font-size: 1.5rem;">predict</a></li>
+						<!-- <li><a href="#logout"style="font-size: 1.5rem;">Logout</a></li> -->
+                    </ul>
+                </nav>
+            </header>
+
+            <div id="main">
+                <!-- Intro -->
+                <article id="intro">
+                    <h2 class="major">Task Introduction</h2>
+                    <span style="font-size: 1.2rem; line-height: 1;">
+                        <p style="display: block; font-family: serif; line-height: normal; font-weight: bolder;">
+                            &emsp;&emsp;根據台北榮民總醫院學訓的資料顯示，以重症加護病房治療的病人為例，
+                            發生急性腎衰竭的比率為30~40%，需要洗腎的比例高達50%以上，不僅伴隨高昂醫療支出，
+                            高達50~80%以上的死亡率更是令人無法接受。急性腎損傷後的倖存者常常腎功能無法完全恢復，
+                            使得慢性腎臟病與末期腎病需長期洗腎者之人數越來越多。
+                        </p>
+                        <p style="display: block; font-family: serif; line-height: normal; font-weight: bolder;">
+                            &emsp;&emsp;因此我們希望能夠藉由機器學習的方式，訓練出一套模型應用於預測急
+                            性腎衰竭的發生，並會隨著時間的推進與資料的不斷輸入而能夠顯示出病人發
+                            生急性腎衰竭的可能性，而醫生或是醫護人員便可透過機率分佈圖觀察到病人
+                            的狀況，從而協助醫生提早治療病患或是進行緊急處理，提升整體醫療品質。
+                        </p>
+                        <p style="display: block; font-family: serif; line-height: normal; font-weight: bolder;">
+                            &emsp;&emsp;Dataset採用成大醫院重症醫學科所提供的ICU臨床檢驗資料，並且與臨床醫師多次討論後選擇共50項特徵
+                        </p>
+                        <div style="font-family: serif;font-weight: bolder;line-height: normal;  display: inline;">
+                        <details>
+                            <summary>特徵類別</summary>
+                            <table border="1">
+                                <tr style="text-align: center;color: #ffffee;">
+                                    <td>基本資料(2個)</td>
+                                    <td>血液檢測(41個)</td>
+                                    <td>尿液檢測(5個)</td>
+                                    <td>血壓檢測(2個)</td>
+                                </tr>
+                                <tr style="text-align: center;color: #ffffff;"">
+                                    <td>年齡, 性別等</td>
+                                    <td>HCT, pH, K等</td>
+                                    <td>尿量, Crystal, Cast等</td>
+                                    <td>Art BP Mean等</td>
+                                </tr>
+                            </table>
+                        </details>
+                        </div>
+                        <p style="display: block; font-family: serif; line-height: normal; font-weight: bolder; color: white;">
+                            <br>&emsp;&emsp;模型訓練的方式選擇以小時為單位切割資料，並使用0~11小時的資料 去預測第17小時的結果，
+                            從而讓模型可以學習到病人11小時內檢測數據的變化 從而預測一小時後發生急性腎衰竭的機率。
+                            最終的預測結果圖是以每11小時為單位滑動，且不斷預測6小時後的機率所形成的機率分佈圖。
+                            最後藉由架設網站方便讓醫師使用並視覺化模型預測結果。</p>
+
+                        <!-- <div style="text-align: right;"><a href="#doctor"><font face="serif" style="font-weight: bolder; color: white; font-size: 1.5rem; color: #fff8dc;">Advisor</font></a></div> -->
+
+                    
+                    </span>
+                </article>
+
+                <article id="aboutModel">
+                    <h2 class="major">Model Introduction</h2>
+                    <p style="display:inline; font-family: serif; line-height: normal; font-weight: bolder;font-size: 1.2rem;">
+                        &emsp;&emsp;病人整體的醫學檢測資料包含了病人(1)不同時間點的資料及(2)同一時間點下的不同檢測資料2種階層，
+                        現存的模型大部分專注於(1)對病人的影響，但卻往往忽略(2)的重要性，若不對(2)的資料作先行處裡，
+                        容易導致許多和目標不相關的雜訊在處裡(1)時被使用。
+                    </p>
+                    <p style="display:inline-block; font-family: serif; line-height: normal; font-weight: bolder;font-size: 1.2rem;">
+                        <br>&emsp;&emsp;因此LSAN提出HAM和TAM兩module，嘗試先利用HAM處理(2)中的雜訊問題，
+                        再由TAM對病人整體病況同時做長時間和短時間的aggregration，藉由這兩個module，
+                        LSAN能達到超越許多現今所使用之模型的表現。
+                    </p>
+                    <img src="/static/images/model.png" align="middle" width="950px" height="550px">
+                    <p><br></p>
+                    <form class="button" style="font-size: 1.2rem; font-family: serif;">
+                    <a href="/static/patient1.pickle" download="patient1.pickle">範例下載</a>
+                    </form>
+                    <form class="button" style="font-size: 1.2rem; font-family: serif;">
+                    <a href="/static/patient2.pickle" download="patient2.pickle">範例下載2</a>
+                    </form>
+                    <form class="button" style="font-size: 1.2rem; font-family: serif;">
+                    <a href="/static/patient3.pickle" download="patient3.pickle">範例下載3</a>
+                    </form>
+                </article>
+
+
+                <article id="logout">
+                    <h2 class="major" style="font-family: 'Noto Sans SC', sans-serif;">Want to Logout ?</h2>
+                    {% if user.is_authenticated %}
+                        <form action="/logout">
+                        <button href="/logout" style="line-height:44px;height: 42px;text-align-all: center;color:white;font-size:30px;text-decoration: none">Logout</button>
+                        </form>
+                    {% endif %}
+                </article>
+
+                <article id="doctor">
+                    <!-- <h1 style="font-weight: normal;font-size: 3rem;text-align: left;">Advisor</h1> -->
+                    <h2 class="major">Advisor</h2>
+                    <img src="/static/images/doctor.jpeg" align="right" width="50%" height="40%" float:right>
+                    <h2 style="font-weight: normal;font-size: 2rem;line-height: 1;">張育誌醫師</h2>
+                    <h3 style="font-weight: normal;font-size: 1rem;line-height: 1;">臨床副教授兼主治醫師</h3>
+                    <div style="font-family: serif; font-weight:bolder; color: white;">
+                    <h3 style="color: white;">
+                        經歷:
+                        <br>國立成功大學醫學院醫學系
+                        <br>國立成功大學醫學院臨床醫學研究所碩士
+                        <br>國立成功大學醫學院臨床醫學研究所博士
+                        <br><br>成大醫院腎臟內科主治醫師
+                        <br>成大醫學院醫學系內科學科臨床助理教授
+                        <br>成大醫院醫療品質委員會副召集人
+                        <br>醫學系導師</h3>
+                    </h3>
+                    </div>
+                    <p><br><br><hr width="100%" color= "gray"/></p>
+                    <img src="/static/images/professor.jpg" align="right" width="50%" height="50%" float:right>
+                    <h2 style="font-weight: normal;font-size: 2rem;line-height: 1;">蔣榮先教授</h2>
+                    <h3 style="font-weight: normal;font-size: 1rem;line-height: normal;">特聘教授<br>成大醫院健康數據資源中心執行長</h3>
+                    <div style="font-family: serif; font-weight:bolder; color: white;">
+                    <h3 style="color: white;">
+                        經歷:
+                        <br>成大醫院健康數據資源中心執行長
+                        <br>美國系統生物學研究院(ISB)合聘教授
+                        <br>成功大學資訊工程學系教授
+                        <br>成功大學醫學院附設醫院資訊室主任
+                        <br>成功大學醫學院附設醫院資訊長 
+                        <br>成功大學醫學院老年學研究所兼任教授
+                        <br>成功大學計算機與網路中心主任 
+                        <br>成功大學圖書館副館長
+                        <br>工研院\電通所\研究員
+                    </h3>
+                    </div>
+                    
+                </article>
+                <article id="experiment">
+                    <h2 class="major">Experiments</h2>
+                    <p style="font-family: serif; font-weight:bolder; color:#ffffee;line-height: normal; font-size: 1.2rem;display: inline;">實驗模型介紹</p>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal; display:inline">
+                    <br><br>HiTANET : transformer-based model</p>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal; display: inline;">
+                    <br>T-LSTM : LSTM-based model</p>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal; display:inline">
+                    <br>包含本次使用的LSAN在內，都是可以針對缺失值做處理(不用補值）</p>
+                    <br><br>
+                    <p style="font-family: serif; font-weight:bolder; color:#ffffee;line-height: normal; font-size: 1.2rem;display:inline;">實驗內容</p>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal;"><br>針對三種時間區段(11個特徵）<br>
+                    時間長度:用病人X小時內的資料去預測病人1小時候會不會發生AKI</p>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">HiTANet</summary>
+                        <table>
+                                <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                    <td>Hour</td>
+                                    <td>AUC</td>
+                                    <td>Prediction</td>
+                                    <td>Recall</td>
+                                    <td>F1 Score</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>5</td>
+                                    <td>0.60</td>
+                                    <td>0.70</td>
+                                    <td>0.83</td>
+                                    <td>0.76</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>11</td>
+                                    <td>0.71</td>
+                                    <td>0.77</td>
+                                    <td>0.90</td>
+                                    <td>0.83</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>23</td>
+                                    <td>0.77</td>
+                                    <td>0.83</td>
+                                    <td>0.85</td>
+                                    <td>0.84</td>
+                                </tr>
+                        </table>
+
+                    </details>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">LSAN</summary>
+                        <table>
+                                <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                    <td>Hour</td>
+                                    <td>AUC</td>
+                                    <td>Prediction</td>
+                                    <td>Recall</td>
+                                    <td>F1 Score</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>5</td>
+                                    <td>0.81</td>
+                                    <td>0.90</td>
+                                    <td>0.57</td>
+                                    <td>0.70</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>11</td>
+                                    <td>0.85</td>
+                                    <td>0.86</td>
+                                    <td>0.86</td>
+                                    <td>0.87</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>23</td>
+                                    <td>0.89</td>
+                                    <td>0.90</td>
+                                    <td>0.78</td>
+                                    <td>0.82</td>
+                                </tr>
+                        </table>
+                    </details>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal;"><br>針對六種預測時間間隔(11個特徵）<br>
+                    時間間隔(Gap):給予模型病人11小時的資料，預測病人X小時後會不會發生AKI
+                    </p>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">T-LSTM</summary>
+                        <table>
+                                <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                    <td>Gap</td>
+                                    <td>AUC</td>
+                                    <td>Prediction</td>
+                                    <td>Recall</td>
+                                    <td>F1 Score</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>1</td>
+                                    <td>0.72</td>
+                                    <td>0.60</td>
+                                    <td>0.65</td>
+                                    <td>0.56</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>2</td>
+                                    <td>0.64</td>
+                                    <td>0.44</td>
+                                    <td>0.79</td>
+                                    <td>0.56</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>3</td>
+                                    <td>0.78</td>
+                                    <td>0.69</td>
+                                    <td>0.68</td>
+                                    <td>0.69</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>4</td>
+                                    <td>0.74</td>
+                                    <td>0.51</td>
+                                    <td>0.62</td>
+                                    <td>0.56</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>5</td>
+                                    <td>0.68</td>
+                                    <td>0.45</td>
+                                    <td>0.72</td>
+                                    <td>0.56</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>6</td>
+                                    <td>0.83</td>
+                                    <td>0.74</td>
+                                    <td>0.54</td>
+                                    <td>0.63</td>
+                                </tr>
+                        </table>
+                    </details>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">HiTANet</summary>
+                        <table>
+                                <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                    <td>Gap</td>
+                                    <td>AUC</td>
+                                    <td>Prediction</td>
+                                    <td>Recall</td>
+                                    <td>F1 Score</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>3</td>
+                                    <td>0.68</td>
+                                    <td>0.78</td>
+                                    <td>0.88</td>
+                                    <td>0.82</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>6</td>
+                                    <td>0.66</td>
+                                    <td>0.76</td>
+                                    <td>0.85</td>
+                                    <td>0.80</td>
+                                </tr>
+                        </table>
+                    </details>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">LSAN</summary>
+                        <table>
+                                <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                    <td>Gap</td>
+                                    <td>AUC</td>
+                                    <td>Prediction</td>
+                                    <td>Recall</td>
+                                    <td>F1 Score</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>1</td>
+                                    <td>0.85</td>
+                                    <td>0.86</td>
+                                    <td>0.86</td>
+                                    <td>0.87</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>2</td>
+                                    <td>0.82</td>
+                                    <td>0.79</td>
+                                    <td>0.84</td>
+                                    <td>0.81</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>3</td>
+                                    <td>0.81</td>
+                                    <td>0.82</td>
+                                    <td>0.80</td>
+                                    <td>0.82</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>4</td>
+                                    <td>0.75</td>
+                                    <td>0.77</td>
+                                    <td>0.78</td>
+                                    <td>0.77</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>5</td>
+                                    <td>0.72</td>
+                                    <td>0.77</td>
+                                    <td>0.78</td>
+                                    <td>0.78</td>
+                                </tr>
+                                <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                    <td>6</td>
+                                    <td>0.74</td>
+                                    <td>0.75</td>
+                                    <td>0.86</td>
+                                    <td>0.80</td>
+                                </tr>
+                        </table>
+                    </details>
+                    <p style="font-family: serif; font-weight:bolder; color:white;line-height: normal;"><br>針對六種預測時間間隔(30、40、50個特徵）<br>
+                        時間間隔(Gap):給予模型病人11小時的資料，預測病人X小時後會不會發生AKI
+                    </p>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">T-LTSM(50 features)</summary>
+                        <table>
+                        <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                            <td>Gap</td>
+                            <td>AUC</td>
+                            <td>Prediction</td>
+                            <td>Recall</td>
+                            <td>F1 Score</td>
+                        </tr>
+                        <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                            <td>3</td>
+                            <td>0.90</td>
+                            <td>0.89</td>
+                            <td>0.61</td>
+                            <td>0.72</td>
+                        </tr>
+                        <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                            <td>6</td>
+                            <td>0.91</td>
+                            <td>0.86</td>
+                            <td>0.66</td>
+                            <td>0.75</td>
+                        </tr>
+                    </table>
+                    </details>
+                    <details>
+                        <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">HiTANet(50 features)</summary>
+                        <table>
+                        <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                            <td>Gap</td>
+                            <td>AUC</td>
+                            <td>Prediction</td>
+                            <td>Recall</td>
+                            <td>F1 Score</td>
+                        </tr>
+                        <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                            <td>3</td>
+                            <td>0.69</td>
+                            <td>0.79</td>
+                            <td>0.87</td>
+                            <td>0.83</td>
+                        </tr>
+                        <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                            <td>6</td>
+                            <td>0.65</td>
+                            <td>0.76</td>
+                            <td>0.86</td>
+                            <td>0.81</td>
+                        </tr>
+                        </table>
+                    </details>
+                    <div style="text-align: left; font-family: serif; font-weight: bolder; line-height: normal; color: #ffffee;"><a href="#moreExpt">LSAN</a></div>
+                </article>
+                <article id="moreExpt">
+                    <h2 class="major">Experiments</h2>
+                    <details>
+                            <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">LSAN(30 features)</summary>
+                            <table>
+                                    <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                        <td>Gap</td>
+                                        <td>AUC</td>
+                                        <td>Prediction</td>
+                                        <td>Recall</td>
+                                        <td>F1 Score</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>1</td>
+                                        <td>0.84</td>
+                                        <td>0.87</td>
+                                        <td>0.87</td>
+                                        <td>0.80</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>2</td>
+                                        <td>0.82</td>
+                                        <td>0.87</td>
+                                        <td>0.73</td>
+                                        <td>0.70</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>3</td>
+                                        <td>0.81</td>
+                                        <td>0.85</td>
+                                        <td>0.73</td>
+                                        <td>0.79</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>4</td>
+                                        <td>0.79</td>
+                                        <td>0.85</td>
+                                        <td>0.72</td>
+                                        <td>0.78</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>5</td>
+                                        <td>0.80</td>
+                                        <td>0.85</td>
+                                        <td>0.73</td>
+                                        <td>0.79</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>6</td>
+                                        <td>0.78</td>
+                                        <td>0.84</td>
+                                        <td>0.70</td>
+                                        <td>0.76</td>
+                                    </tr>
+                            </table>
+                        </details>
+                        <details>
+                            <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">LSAN(40 features)</summary>
+                            <table>
+                                    <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                        <td>Gap</td>
+                                        <td>AUC</td>
+                                        <td>Prediction</td>
+                                        <td>Recall</td>
+                                        <td>F1 Score</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>1</td>
+                                        <td>0.85</td>
+                                        <td>0.89</td>
+                                        <td>0.73</td>
+                                        <td>0.80</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>2</td>
+                                        <td>0.82</td>
+                                        <td>0.86</td>
+                                        <td>0.76</td>
+                                        <td>0.80</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>3</td>
+                                        <td>0.81</td>
+                                        <td>0.85</td>
+                                        <td>0.76</td>
+                                        <td>0.80</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>4</td>
+                                        <td>0.78</td>
+                                        <td>0.84</td>
+                                        <td>0.76</td>
+                                        <td>0.79</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>5</td>
+                                        <td>0.79</td>
+                                        <td>0.84</td>
+                                        <td>0.70</td>
+                                        <td>0.76</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>6</td>
+                                        <td>0.78</td>
+                                        <td>0.83</td>
+                                        <td>0.76</td>
+                                        <td>0.79</td>
+                                    </tr>
+                            </table>
+                        </details>
+                        <details>
+                            <summary style="line-height: normal;font-family: serif; font-weight:strong; color:#ffffee;">LSAN(50 features)</summary>
+                            <table>
+                                    <tr style="font-family: serif; font-weight:strong; color:#ffffee;">
+                                        <td>Gap</td>
+                                        <td>AUC</td>
+                                        <td>Prediction</td>
+                                        <td>Recall</td>
+                                        <td>F1 Score</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>1</td>
+                                        <td>0.84</td>
+                                        <td>0.86</td>
+                                        <td>0.79</td>
+                                        <td>0.82</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>2</td>
+                                        <td>0.82</td>
+                                        <td>0.86</td>
+                                        <td>0.71</td>
+                                        <td>0.78</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>3</td>
+                                        <td>0.81</td>
+                                        <td>0.85</td>
+                                        <td>0.84</td>
+                                        <td>0.82</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>4</td>
+                                        <td>0.79</td>
+                                        <td>0.84</td>
+                                        <td>0.74</td>
+                                        <td>0.79</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>5</td>
+                                        <td>0.79</td>
+                                        <td>0.86</td>
+                                        <td>0.69</td>
+                                        <td>0.79</td>
+                                    </tr>
+                                    <tr style="font-family: serif; font-weight:bolder; color:#ffffff;">
+                                        <td>6</td>
+                                        <td>0.78</td>
+                                        <td>0.84</td>
+                                        <td>0.85</td>
+                                        <td>0.82</td>
+                                    </tr>
+                            </table>
+                        </details>
+                </article>
+                <!-- Contact -->
+                <article id="predict">
+                    <h2 class="major" style="text-transform: initial;">Source</h2>
+                    <form method="post" action="#" style="padding-left: 35%;">
+                        <ul class="actions">
+                            <li><a href="#predictfile"><input style="font-size: 1.5rem;" type="button" value="&nbsp;Upload&nbsp;&nbsp; File&nbsp;" class="primary" /></a></li>
+                        </ul>
+                    </form>
+                </article>
+
+                <article id="predictfile" style="height: 22rem;">
+                    <label for="document"><h2 class="major">Upload File(pickle files):</h2></label>
+                    <h3>Please Read the <a href="#aboutModel">Model Introduction</a> Before you Upload File !</h3>
+
+                   <span style="position: fixed;top: 13rem;">
+                    <form action="/predictresultforfile/" method="post" action="#contact" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="document" >
+                        <button type="submit" name="Upload">LSAN Prediction</button>
+                    </form>
+                        </span>
+                </article>
+
+
+{#                #end of article#}
+            </div>
+
+            <footer id="footer" >
+                <p class="copyright"style="float: right">&copy; Untitled. Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+            </footer>
+        </div>
+        <div id="bg"></div>
+		<!-- Scripts -->
+			<script src="/static/assets/js/jquery.min.js"></script>
+			<script src="/static/assets/js/browser.min.js"></script>
+			<script src="/static/assets/js/breakpoints.min.js"></script>
+			<script src="/static/assets/js/util.js"></script>
+			<script src="/static/assets/js/main.js"></script>
+    </body>
+</html>

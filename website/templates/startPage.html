@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    <title>StartPage</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href='/static/assets/css/main.css'>
+		<noscript><link rel="stylesheet" type="text/css" href="/static/assets/css/noscript.css" /></noscript>
+</head>
+
+<body class="is-preload">
+    <div id="wrapper" style="display: flex;justify-content: center;align-items: center; ">
+        <form action="/login/" method="post" style="justify-content: center;align-items: center;">
+            {% csrf_token %}
+            <input type="image" src="/static/images/Main.png" height="600vh" onClick="document.createEvent(onsubmit);"/>
+        </form>
+
+    </div>
+        <div id="bg"></div>
+		<!-- Scripts -->
+			<script src="/static/assets/js/jquery.min.js"></script>
+			<script src="/static/assets/js/browser.min.js"></script>
+			<script src="/static/assets/js/breakpoints.min.js"></script>
+			<script src="/static/assets/js/util.js"></script>
+			<script src="/static/assets/js/main.js"></script>
+
+</body>
+
+</html>
